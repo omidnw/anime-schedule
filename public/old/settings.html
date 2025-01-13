@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Settings - Guffy World</title>
+		<!-- Tailwind CSS CDN -->
+		<link
+			href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+			rel="stylesheet"
+		/>
+		<!-- Custom Font (Comic Neue for a playful anime feel) -->
+		<link
+			href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap"
+			rel="stylesheet"
+		/>
+		<!-- Global Styles -->
+		<link rel="stylesheet" href="/styles.css" />
+		<!-- Theme Provider Script -->
+		<script src="/theme-provider.js"></script>
+	</head>
+	<body>
+		<!-- Header will be injected here -->
+		<div id="header"></div>
+
+		<!-- Settings Section -->
+		<section class="py-16">
+			<div class="container mx-auto px-6">
+				<h2 class="text-4xl font-bold text-center mb-12">Choose Your Theme</h2>
+				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+					<!-- Dark Theme -->
+					<div
+						class="theme-card bg-[#1A1A2E] p-8 rounded-lg text-center shadow-lg transform transition-all duration-300 hover:scale-105 cursor-pointer"
+						data-theme="dark"
+					>
+						<h3 class="text-2xl font-bold mb-4 text-white">Dark Theme</h3>
+						<p class="text-gray-200">Elegant and modern dark theme.</p>
+					</div>
+					<!-- Light Theme -->
+					<div
+						class="theme-card bg-[#F5F5F5] p-8 rounded-lg text-center shadow-lg transform transition-all duration-300 hover:scale-105 cursor-pointer"
+						data-theme="light"
+					>
+						<h3 class="text-2xl font-bold mb-4 text-[#333333]">Light Theme</h3>
+						<p class="text-gray-700">Clean and minimal light theme.</p>
+					</div>
+					<!-- Anime Theme -->
+					<div
+						class="theme-card bg-[#FF6F61] p-8 rounded-lg text-center shadow-lg transform transition-all duration-300 hover:scale-105 cursor-pointer"
+						data-theme="anime"
+					>
+						<h3 class="text-2xl font-bold mb-4 text-white">Anime Theme</h3>
+						<p class="text-gray-200">Vibrant and playful anime theme.</p>
+					</div>
+					<!-- Retro Theme -->
+					<div
+						class="theme-card bg-[#FFD700] p-8 rounded-lg text-center shadow-lg transform transition-all duration-300 hover:scale-105 cursor-pointer"
+						data-theme="retro"
+					>
+						<h3 class="text-2xl font-bold mb-4 text-[#1A1A2E]">Retro Theme</h3>
+						<p class="text-gray-200">Nostalgic and colorful retro theme.</p>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- Footer will be injected here -->
+		<div id="footer"></div>
+
+		<!-- Load Header and Footer -->
+		<script>
+			// Load Header
+			fetch("/header.html")
+				.then((response) => response.text())
+				.then((data) => {
+					document.getElementById("header").innerHTML = data;
+				});
+
+			// Load Footer
+			fetch("/footer.html")
+				.then((response) => response.text())
+				.then((data) => {
+					document.getElementById("footer").innerHTML = data;
+				});
+		</script>
+
+		<!-- Theme Selection Script -->
+		<script>
+			// Get all theme cards
+			const themeCards = document.querySelectorAll(".theme-card");
+
+			// Add click event listeners to theme cards
+			themeCards.forEach((card) => {
+				card.addEventListener("click", () => {
+					const selectedTheme = card.getAttribute("data-theme");
+					// Save the selected theme to local storage
+					ThemeProvider.saveTheme(selectedTheme);
+					alert(`Theme "${selectedTheme}" saved successfully!`);
+				});
+			});
+
+			// Load the saved theme on page load
+			const savedTheme = ThemeProvider.getCurrentTheme();
+			ThemeProvider.applyTheme(savedTheme);
+		</script>
+	</body>
+</html>
