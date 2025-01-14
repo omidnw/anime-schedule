@@ -7,7 +7,7 @@ const PUBLIC_DIR = path.join(__dirname, "../public");
 
 const server = http.createServer((req, res) => {
 	// Determine the file path based on the request URL
-	let filePath = path.join(
+	const filePath = path.join(
 		PUBLIC_DIR,
 		req.url === "/" ? "index.html" : req.url!
 	);

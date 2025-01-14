@@ -22,7 +22,7 @@
 	}
 
 	.hero {
-		background-image: url("/hero-bg.jpg");
+		background-image: url("/anime-schedule/hero-bg.jpg");
 		background-size: cover;
 		background-position: center;
 		position: relative;
