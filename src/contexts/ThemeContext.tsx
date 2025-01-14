@@ -36,23 +36,37 @@ const themes = {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
+const getInitialTheme = (): Theme => {
+	if (typeof window !== "undefined") {
+		const savedTheme = localStorage.getItem("theme") as Theme;
+		if (savedTheme && Object.keys(themes).includes(savedTheme)) {
+			return savedTheme;
+		}
+	}
+	return "dark"; // Default theme
+};
+
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
 	children,
 }) => {
-	const [currentTheme, setCurrentTheme] = useState<Theme>(
-		() => (localStorage.getItem("theme") as Theme) || "dark"
-	);
+	const [currentTheme, setCurrentTheme] = useState<Theme>(getInitialTheme);
 
 	useEffect(() => {
-		localStorage.setItem("theme", currentTheme);
-		const colors = themes[currentTheme];
-		Object.entries(colors).forEach(([key, value]) => {
-			document.documentElement.style.setProperty(`--${key}`, value);
-		});
+		if (typeof window !== "undefined") {
+			localStorage.setItem("theme", currentTheme);
+			const colors = themes[currentTheme];
+			if (colors) {
+				Object.entries(colors).forEach(([key, value]) => {
+					document.documentElement.style.setProperty(`--${key}`, value);
+				});
+			}
+		}
 	}, [currentTheme]);
 
 	const setTheme = (theme: Theme) => {
-		setCurrentTheme(theme);
+		if (Object.keys(themes).includes(theme)) {
+			setCurrentTheme(theme);
+		}
 	};
 
 	return (
