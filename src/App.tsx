@@ -10,7 +10,7 @@ import AnimeDetails from "./pages/AnimeDetails";
 function App() {
 	return (
 		<ThemeProvider>
-			<Router basename="/anime-schedule">
+			<Router>
 				<div className="min-h-screen flex flex-col bg-[var(--background)] text-[var(--text)]">
 					<Header />
 					<main className="flex-grow">
