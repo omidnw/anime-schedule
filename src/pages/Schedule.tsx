@@ -26,25 +26,38 @@ interface Preferences {
 	selectedDay: WeekDay;
 }
 
-// Load preferences from localStorage
+// Use a namespace for preferences storage
+const PREFERENCES_STORAGE_KEY = "omidnw_schedule_prefs_v1";
+
+// Load preferences from localStorage with proper type checking
 const loadPreferences = (): Preferences => {
-	const saved = localStorage.getItem("animeSchedulePreferences");
-	if (saved) {
-		return JSON.parse(saved);
-	}
-	return {
+	const defaultPrefs: Preferences = {
 		viewMode: "weekly",
 		displayMode: "card",
 		selectedYear: new Date().getFullYear(),
 		selectedSeason: "winter",
 		selectedDay: "monday",
 	};
+
+	try {
+		const saved = localStorage.getItem(PREFERENCES_STORAGE_KEY);
+		if (!saved) return defaultPrefs;
+
+		const parsed = JSON.parse(saved) as Partial<Preferences>;
+		return {
+			viewMode: parsed.viewMode || defaultPrefs.viewMode,
+			displayMode: parsed.displayMode || defaultPrefs.displayMode,
+			selectedYear: parsed.selectedYear || defaultPrefs.selectedYear,
+			selectedSeason: parsed.selectedSeason || defaultPrefs.selectedSeason,
+			selectedDay: parsed.selectedDay || defaultPrefs.selectedDay,
+		};
+	} catch {
+		return defaultPrefs;
+	}
 };
 
 const Schedule: React.FC = () => {
-	const [preferences, setPreferences] = useState<Preferences>(
-		loadPreferences()
-	);
+	const [preferences, setPreferences] = useState<Preferences>(loadPreferences);
 	const [animeList, setAnimeList] = useState<AnimeItem[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
@@ -63,10 +76,7 @@ const Schedule: React.FC = () => {
 
 	// Save preferences to localStorage whenever they change
 	useEffect(() => {
-		localStorage.setItem(
-			"animeSchedulePreferences",
-			JSON.stringify(preferences)
-		);
+		localStorage.setItem(PREFERENCES_STORAGE_KEY, JSON.stringify(preferences));
 	}, [preferences]);
 
 	useEffect(() => {
@@ -124,6 +134,14 @@ const Schedule: React.FC = () => {
 			await loadAnimeData();
 		}
 	};
+
+	// Update button styles to use theme variables consistently
+	const buttonStyles = (isActive: boolean) =>
+		`px-4 py-2 rounded-lg transition-colors ${
+			isActive
+				? "bg-[var(--primary)] text-white"
+				: "bg-[var(--background)] border border-[var(--primary)] text-[var(--primary)]"
+		}`;
 
 	const renderAnimeCard = (anime: AnimeItem) => (
 		<Link
@@ -243,31 +261,19 @@ const Schedule: React.FC = () => {
 			<div className="flex justify-center mb-8 space-x-4">
 				<button
 					onClick={() => updatePreference("viewMode", "weekly")}
-					className={`px-4 py-2 rounded-lg transition-colors ${
-						preferences.viewMode === "weekly"
-							? "bg-[var(--primary)] text-white"
-							: "bg-[var(--background)] border border-[var(--primary)] text-[var(--primary)]"
-					}`}
+					className={buttonStyles(preferences.viewMode === "weekly")}
 				>
 					Weekly Schedule
 				</button>
 				<button
 					onClick={() => updatePreference("viewMode", "seasonal")}
-					className={`px-4 py-2 rounded-lg transition-colors ${
-						preferences.viewMode === "seasonal"
-							? "bg-[var(--primary)] text-white"
-							: "bg-[var(--background)] border border-[var(--primary)] text-[var(--primary)]"
-					}`}
+					className={buttonStyles(preferences.viewMode === "seasonal")}
 				>
 					Seasonal Anime
 				</button>
 				<button
 					onClick={() => updatePreference("viewMode", "search")}
-					className={`px-4 py-2 rounded-lg transition-colors ${
-						preferences.viewMode === "search"
-							? "bg-[var(--primary)] text-white"
-							: "bg-[var(--background)] border border-[var(--primary)] text-[var(--primary)]"
-					}`}
+					className={buttonStyles(preferences.viewMode === "search")}
 				>
 					Search Anime
 				</button>

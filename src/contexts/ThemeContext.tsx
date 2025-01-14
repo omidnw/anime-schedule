@@ -7,60 +7,69 @@ interface ThemeContextType {
 	setTheme: (theme: Theme) => void;
 }
 
+// Use a namespace to avoid conflicts
+const STORAGE_KEY = "omidnw_theme_v1";
+
 const themes = {
 	dark: {
-		background: "#121212",
-		text: "#FFFFFF",
-		primary: "#BB86FC",
-		secondary: "#03DAC6",
+		background: "#121212", // Dark Gray
+		text: "#FFFFFF", // White
+		primary: "#BB86FC", // Purple
+		secondary: "#03DAC6", // Teal
 	},
 	light: {
-		background: "#FFFFFF",
-		text: "#333333",
-		primary: "#6200EE",
-		secondary: "#03DAC6",
+		background: "#FFFFFF", // White
+		text: "#333333", // Dark Gray for better contrast
+		primary: "#6200EE", // Indigo
+		secondary: "#03DAC6", // Teal
 	},
 	anime: {
-		background: "#FF4081",
-		text: "#FFFFFF",
-		primary: "#3F51B5",
-		secondary: "#FFC107",
+		background: "#FF4081", // Pink
+		text: "#FFFFFF", // White
+		primary: "#3F51B5", // Indigo
+		secondary: "#FFC107", // Amber
 	},
 	retro: {
-		background: "#F5F5DC",
-		text: "#333333",
-		primary: "#FF4500",
-		secondary: "#32CD32",
+		background: "#F5F5DC", // Beige
+		text: "#333333", // Dark Gray for better contrast
+		primary: "#FF4500", // Orange Red
+		secondary: "#32CD32", // Lime Green
 	},
 };
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-const getInitialTheme = (): Theme => {
-	if (typeof window !== "undefined") {
-		const savedTheme = localStorage.getItem("theme") as Theme;
-		if (savedTheme && Object.keys(themes).includes(savedTheme)) {
-			return savedTheme;
-		}
-	}
-	return "dark"; // Default theme
+const getCurrentTheme = (): Theme => {
+	if (typeof window === "undefined") return "dark";
+	const savedTheme = localStorage.getItem(STORAGE_KEY);
+	return (
+		savedTheme && Object.keys(themes).includes(savedTheme) ? savedTheme : "dark"
+	) as Theme;
+};
+
+const applyTheme = (theme: Theme) => {
+	const colors = themes[theme];
+	if (!colors || typeof window === "undefined") return;
+
+	Object.entries(colors).forEach(([key, value]) => {
+		document.documentElement.style.setProperty(`--${key}`, value);
+	});
 };
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
 	children,
 }) => {
-	const [currentTheme, setCurrentTheme] = useState<Theme>(getInitialTheme);
+	const [currentTheme, setCurrentTheme] = useState<Theme>(getCurrentTheme);
 
 	useEffect(() => {
-		if (typeof window !== "undefined") {
-			localStorage.setItem("theme", currentTheme);
-			const colors = themes[currentTheme];
-			if (colors) {
-				Object.entries(colors).forEach(([key, value]) => {
-					document.documentElement.style.setProperty(`--${key}`, value);
-				});
-			}
-		}
+		// Initialize theme on mount
+		applyTheme(currentTheme);
+	}, []); // Only run once on mount
+
+	useEffect(() => {
+		// Update theme when it changes
+		localStorage.setItem(STORAGE_KEY, currentTheme);
+		applyTheme(currentTheme);
 	}, [currentTheme]);
 
 	const setTheme = (theme: Theme) => {
