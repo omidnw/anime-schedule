@@ -6,6 +6,7 @@ import Home from "./pages/Home";
 import Schedule from "./pages/Schedule";
 import Settings from "./pages/Settings";
 import AnimeDetails from "./pages/AnimeDetails";
+import About from "./pages/About";
 
 function App() {
 	return (
@@ -19,6 +20,7 @@ function App() {
 							<Route path="/schedule" element={<Schedule />} />
 							<Route path="/settings" element={<Settings />} />
 							<Route path="/anime/:id" element={<AnimeDetails />} />
+							<Route path="/about" element={<About />} />
 						</Routes>
 					</main>
 					<Footer />
